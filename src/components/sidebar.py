@@ -1,43 +1,10 @@
 import streamlit as st
 from auth.session_manager import SessionManager
 from components.footer import show_footer
-from config.app_config import ANALYSIS_DAILY_LIMIT
 
 def show_sidebar():
     """显示侧边栏"""
     with st.sidebar:
-        
-        # 添加分析计数器
-        if 'analysis_count' not in st.session_state:
-            st.session_state.analysis_count = 0
-        
-        # 计算剩余分析次数
-        remaining = ANALYSIS_DAILY_LIMIT - st.session_state.analysis_count
-        # 显示每日分析限额
-        st.markdown(
-            f"""
-            <div style='
-                padding: 0.5rem;
-                border-radius: 0.5rem;
-                background: rgba(100, 181, 246, 0.1);
-                margin: 0.5rem 0;
-                text-align: center;
-                font-size: 1.1em;
-            '>
-                <p style='margin: 0; color: #666;'>每日分析限额</p>
-                <p style='
-                    margin: 0.2rem 0 0 0;
-                    color: {"#1976D2" if remaining > 3 else "#FF4B4B"};
-                    font-weight: 500;
-                '>
-                    剩余 {remaining}/{ANALYSIS_DAILY_LIMIT}
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        st.markdown("---")  # 分隔线
         # 显示会话列表
         show_session_list()
         

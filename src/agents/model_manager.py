@@ -1,50 +1,25 @@
 import groq
 import streamlit as st
-from enum import Enum
 import logging
 import time
 
 logger = logging.getLogger(__name__)
-
-class ModelTier(Enum):
-    PRIMARY = "primary"
-    SECONDARY = "secondary" 
-    TERTIARY = "tertiary"
-    FALLBACK = "fallback"
 
 class ModelManager:
     """
     Manages AI model selection, fallback, and rate limits.
     Implements an agent-based approach for model management.
     """
-    
-    MODEL_CONFIG = {
-        ModelTier.PRIMARY: {
-            "provider": "groq",
-            "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
-            "max_tokens": 2000,
-            "temperature": 0.7
-        },
-        ModelTier.SECONDARY: {
-            "provider": "groq", 
-            "model": "llama-3.3-70b-versatile",
-            "max_tokens": 2000,
-            "temperature": 0.7
-        },
-        ModelTier.TERTIARY: {
-            "provider": "groq",
-            "model": "llama-3.1-8b-instant",
-            "max_tokens": 2000, 
-            "temperature": 0.7
-        },
-        ModelTier.FALLBACK: {
-            "provider": "groq",
-            "model": "llama3-70b-8192",
-            "max_tokens": 2000,
-            "temperature": 0.7
-        }
-    }
-    
+
+    MODELS = [
+        "meta-llama/llama-4-maverick-17b-128e-instruct",
+        "llama-3.3-70b-versatile",
+        "llama-3.1-8b-instant",
+        "llama3-70b-8192",
+    ]
+    MAX_TOKENS = 2000
+    TEMPERATURE = 0.7
+
     def __init__(self):
         self.clients = {}
         self._initialize_clients()
@@ -64,29 +39,19 @@ class ModelManager:
         if retry_count > 3:
             return {"success": False, "error": "All models failed after multiple retries"}
 
-        # Determine which model tier to use based on retry count
-        if retry_count == 0:
-            tier = ModelTier.PRIMARY
-        elif retry_count == 1:
-            tier = ModelTier.SECONDARY
-        elif retry_count == 2:
-            tier = ModelTier.TERTIARY
-        else:
-            tier = ModelTier.FALLBACK
-            
-        model_config = self.MODEL_CONFIG[tier]
-        provider = model_config["provider"]
-        model = model_config["model"]
-        
+        index = retry_count if retry_count < len(self.MODELS) else len(self.MODELS) - 1
+        provider = "groq"
+        model = self.MODELS[index]
+
         # Check if we have a client for this provider
         if provider not in self.clients:
             logger.error(f"No client available for provider: {provider}")
             return self.generate_analysis(data, system_prompt, retry_count + 1)
-            
+
         try:
             client = self.clients[provider]
             logger.info(f"Attempting generation with {provider} model: {model}")
-            
+
             if provider == "groq":
                 completion = client.chat.completions.create(
                     model=model,
@@ -94,10 +59,10 @@ class ModelManager:
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": str(data)}
                     ],
-                    temperature=model_config["temperature"],
-                    max_tokens=model_config["max_tokens"]
+                    temperature=self.TEMPERATURE,
+                    max_tokens=self.MAX_TOKENS,
                 )
-                
+
                 return {
                     "success": True,
                     "content": completion.choices[0].message.content,

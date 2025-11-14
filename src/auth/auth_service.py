@@ -148,7 +148,7 @@ class AuthService:
         """创建新的聊天会话"""
         try:
             current_time = datetime.now()
-            default_title = f"{current_time.strftime('%Y-%m-%d / %H:%M:%S')}"
+            default_title = f"{current_time.strftime('%Y-%m-%d | %H-%M-%S')}"
             
             session_data = {
                 'user_id': user_id,

@@ -14,11 +14,10 @@ def show_login_page():
     current_form = st.session_state['form_type']  # 使用字典式访问以保持一致性
 
     
-    # 显示应用的名称和描述
+    # 显示应用名称（避免重复副标题）
     st.markdown(f"""
         <div style='text-align: center; padding: 2rem;'>
             <h1>{APP_NAME}</h1>
-            <h3>{APP_DESCRIPTION}</h3>
         </div>
     """, unsafe_allow_html=True)
 

@@ -7,22 +7,25 @@ from config.app_config import MAX_UPLOAD_SIZE_MB
 
 def show_analysis_form():
     """显示分析表单和报告上传器"""
-    # 根据要求，报告来源固定为“上传PDF”
-    report_source = "Upload PDF"
-    # 获取报告内容
-    pdf_contents = get_report_contents(report_source)
-            
-    # 如果有报告内容，则渲染患者表单
-    if pdf_contents:
-        render_patient_form(pdf_contents)
+    # 使用列布局使上传和分析区域居中
+    left_col, center_col, right_col = st.columns([1, 2, 1])
+    with center_col:
+        # 根据要求，报告来源固定为“上传PDF”
+        report_source = "Upload PDF"
+        # 获取报告内容
+        pdf_contents = get_report_contents(report_source)
+                
+        # 如果有报告内容，则渲染患者表单
+        if pdf_contents:
+            render_patient_form(pdf_contents)
 
 def get_report_contents(report_source):
     """根据报告来源获取报告内容"""
     if report_source == "Upload PDF":
         # 创建文件上传器
         uploaded_file = st.file_uploader(
-            "上传您的体检报告PDF文件", 
-            label_visibility="collapsed", 
+            "上传体检报告 PDF 文件（支持拖拽或点击，单个文件最大 20MB）",
+            label_visibility="visible",
             type=['pdf'],
             help=f"最大文件大小: {MAX_UPLOAD_SIZE_MB}MB。只支持包含医疗报告的 PDF 文件"
         )
@@ -48,7 +51,7 @@ def get_report_contents(report_source):
                 st.error(pdf_contents)
                 return None
             # 在可展开部分显示提取的报告内容
-            with st.expander("查看提取的报告"):
+            with st.expander("报告数据"):
                 st.text(pdf_contents)
             return pdf_contents
     else:

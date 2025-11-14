@@ -4,3 +4,4 @@ groq>=0.18.0
 pdfplumber>=0.11.5
 filetype>=1.2.0
 gotrue
+reportlab>=3.6.12
