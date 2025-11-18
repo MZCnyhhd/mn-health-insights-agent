@@ -14,6 +14,12 @@ class SessionManager:
             # 尝试从持久化存储中恢复会话
             SessionManager._restore_from_storage()
             
+        # 确保关键的会话状态键存在
+        if 'user' not in st.session_state:
+            st.session_state.user = None
+        if 'authenticated' not in st.session_state:
+            st.session_state.authenticated = False
+
         # 初始化认证服务
         if 'auth_service' not in st.session_state:
             from auth.auth_service import AuthService
@@ -30,8 +36,8 @@ class SessionManager:
         # 更新最后活动时间
         st.session_state.last_activity = datetime.now()
         
-        # 验证令牌和用户数据
-        if 'user' in st.session_state:
+        # 当存在已登录用户和令牌时才验证会话
+        if st.session_state.user and st.session_state.get('auth_token'):
             user_data = st.session_state.auth_service.validate_session_token()
             if not user_data:
                 SessionManager.clear_session_state()

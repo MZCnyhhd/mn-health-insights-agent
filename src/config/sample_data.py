@@ -1,38 +1,34 @@
-SAMPLE_REPORT = """BLOOD TEST REPORT
-Date: 15/03/2024
-Laboratory: HealthCare Diagnostics
+SAMPLE_REPORT = """--- 个人信息 ---
+姓名: 赵秀英
+年龄: 68
+性别: 女
+体检编号: MN-202501180833
 
-COMPLETE BLOOD COUNT (CBC)
-Hemoglobin: 13.5 g/dL (Reference: 12.0-15.5)
-White Blood Cells: 7,500 /µL (Reference: 4,000-11,000)
-Platelets: 250,000 /µL (Reference: 150,000-450,000)
-Red Blood Cells: 4.8 M/µL (Reference: 4.0-5.2)
-Hematocrit: 41% (Reference: 36-46%)
+--- 一般检查 ---
+身高: 158 cm
+体重: 70 kg
+体重指数 (BMI): 28.0
+血压: 170/100 mmHg
 
-METABOLIC PANEL
-Glucose (Fasting): 95 mg/dL (Reference: 70-100)
-Creatinine: 0.9 mg/dL (Reference: 0.6-1.2)
-BUN: 15 mg/dL (Reference: 7-20)
-Sodium: 140 mEq/L (Reference: 135-145)
-Potassium: 4.0 mEq/L (Reference: 3.5-5.0)
+--- 血液检查 ---
+项目名称	检测结果	单位
+血红蛋白 (Hemoglobin)	88	g/L
+白细胞 (WBC)	3.1	x 10^9/L
+血小板 (Platelets)	85	x 10^9/L
+谷丙转氨酶 (ALT)	150	U/L
+总胆红素 (Bilirubin)	38	µmol/L
+肌酐 (Creatinine)	190	µmol/L
+总胆固醇 (Cholesterol)	8.5	mmol/L
+空腹血糖 (Glucose)	15.2	mmol/L
+尿酸 (Uric Acid)	690	µmol/L
 
-LIPID PROFILE
-Total Cholesterol: 180 mg/dL (Reference: <200)
-HDL Cholesterol: 55 mg/dL (Reference: >40)
-LDL Cholesterol: 100 mg/dL (Reference: <100)
-Triglycerides: 150 mg/dL (Reference: <150)
+--- 尿液检查 ---
+尿常规: 尿蛋白 (PRO) ++, 尿糖 (GLU) +++
 
-LIVER FUNCTION
-ALT: 25 U/L (Reference: 7-56)
-AST: 24 U/L (Reference: 10-40)
-Alkaline Phosphatase: 70 U/L (Reference: 44-147)
-Total Bilirubin: 0.8 mg/dL (Reference: 0.3-1.2)
+--- 影像学检查 ---
+腹部 B 超: 肝脏表面不光滑，脾脏厚度 5.5cm，双肾实质回声增强。
+胸部 CT: 双肺可见多发磨玻璃结节影。
 
-THYROID FUNCTION
-TSH: 2.5 µIU/mL (Reference: 0.4-4.0)
-T4: 1.2 ng/dL (Reference: 0.8-1.8)
-
-Additional Notes:
-All values are within normal reference ranges.
-No significant abnormalities detected.
-""" 
+--- 心电图 (ECG) ---
+心电图: 心律不齐，T 波倒置。
+"""

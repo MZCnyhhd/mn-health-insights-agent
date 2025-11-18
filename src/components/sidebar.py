@@ -5,6 +5,14 @@ from components.footer import show_footer
 def show_sidebar():
     """显示侧边栏"""
     with st.sidebar:
+        if st.button("➕ 创建体检报告", use_container_width=True, type="primary"):
+            success, session = SessionManager.create_chat_session()
+            if success:
+                st.session_state.current_session = session
+                st.rerun()
+            else:
+                st.error("创建会话失败")
+
         # 显示会话列表
         show_session_list()
         
@@ -27,16 +35,19 @@ def show_session_list():
             if sessions:
                 st.subheader("历史体检报告")  # 显示子标题
                 render_session_list(sessions)  # 渲染会话列表
+
+                selected_sessions = st.session_state.get("selected_sessions", [])
+                if selected_sessions:
+                    if st.button("删除勾选体检报告", type="primary", use_container_width=True):
+                        handle_bulk_delete(selected_sessions)
             else:
-                st.info("没有以前的会话")  # 如果没有会话，则显示信息
+                st.info("没有历史体检报告")  # 如果没有会话，则显示信息
 
 def render_session_list(sessions):
     """渲染会话列表"""
-    # 存储删除确认状态
-    if 'delete_confirmation' not in st.session_state:
-        st.session_state.delete_confirmation = None
-    
-    # 遍历并渲染每个会话项
+    if 'selected_sessions' not in st.session_state:
+        st.session_state.selected_sessions = []
+
     for session in sessions:
         render_session_item(session)
 
@@ -50,54 +61,50 @@ def render_session_item(session):
     current_session = st.session_state.get('current_session', {})
     current_session_id = current_session.get('id') if isinstance(current_session, dict) else None
     
-    # 为每个会话创建一个容器
-    with st.container():
-        # 会话标题和删除按钮并排显示
-        title_col, delete_col = st.columns([4, 1])
-        
-        with title_col:
-            # 显示会话标题按钮
-            if st.button(f"📝 {session['title']}", key=f"session_{session_id}", use_container_width=True):
-                st.session_state.current_session = session  # 设置为当前会话
-                st.rerun()  # 重新运行应用
-        
-        with delete_col:
-            # 显示删除按钮
-            if st.button("🗑️", key=f"delete_{session_id}", help="删除此会话"):
-                # 切换删除确认状态
-                if st.session_state.delete_confirmation == session_id:
-                    st.session_state.delete_confirmation = None
-                else:
-                    st.session_state.delete_confirmation = session_id
-                st.rerun()
-        
-        # 如果此会话正在被删除，则显示确认信息
-        if st.session_state.delete_confirmation == session_id:
-            st.warning("删除以上会话？")
-            left_btn, right_btn = st.columns(2)
-            with left_btn:
-                # 确认删除按钮
-                if st.button("是", key=f"confirm_delete_{session_id}", type="primary", use_container_width=True):
-                    handle_delete_confirmation(session_id, current_session_id)
-            with right_btn:
-                # 取消删除按钮
-                if st.button("否", key=f"cancel_delete_{session_id}", use_container_width=True):
-                    st.session_state.delete_confirmation = None
-                    st.rerun()
+    checkbox_col, title_col = st.columns([0.7, 4])
 
-def handle_delete_confirmation(session_id, current_session_id):
-    """处理删除确认"""
-    if not session_id:
-        st.error("无效的会话")
+    selected_sessions = st.session_state.get("selected_sessions", [])
+
+    with checkbox_col:
+        checked = st.checkbox(
+            "",
+            key=f"select_{session_id}",
+            value=session_id in selected_sessions,
+            help="勾选后可批量删除体检报告",
+        )
+        if checked and session_id not in selected_sessions:
+            selected_sessions.append(session_id)
+        elif not checked and session_id in selected_sessions:
+            selected_sessions.remove(session_id)
+        st.session_state.selected_sessions = selected_sessions
+
+    with title_col:
+        if st.button(
+            f"📝 {session['title']}",
+            key=f"session_{session_id}",
+            use_container_width=True,
+        ):
+            st.session_state.current_session = session
+            st.rerun()
+
+
+def handle_bulk_delete(selected_session_ids):
+    """批量删除选中的会话"""
+    if not selected_session_ids:
         return
-        
-    # 删除会话
-    success, error = SessionManager.delete_session(session_id)
-    if success:
-        st.session_state.delete_confirmation = None
-        # 如果删除的是当前会话，则清除当前会话状态
-        if current_session_id and current_session_id == session_id:
-            st.session_state.current_session = None
-        st.rerun()
-    else:
-        st.error(f"删除失败: {error}")
+
+    current_session = st.session_state.get("current_session", {})
+    current_session_id = current_session.get("id") if isinstance(current_session, dict) else None
+
+    for session_id in list(selected_session_ids):
+        success, error = SessionManager.delete_session(session_id)
+        if not success:
+            st.error(f"删除失败: {error}")
+            return
+
+    if current_session_id and current_session_id in selected_session_ids:
+        st.session_state.current_session = None
+
+    st.session_state.selected_sessions = []
+    st.success("已删除选中的体检报告")
+    st.rerun()
