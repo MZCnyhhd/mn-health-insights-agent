@@ -1,26 +1,25 @@
-import streamlit as st
-from datetime import datetime, timedelta
-from config.app_config import SESSION_TIMEOUT_MINUTES
+import streamlit as st  # 引入 Streamlit 会话状态容器
+from datetime import datetime, timedelta  # 处理时间计算与超时逻辑
+from config.app_config import SESSION_TIMEOUT_MINUTES  # 会话超时配置
 import json
 
 class SessionManager:
-    """管理用户会话，包括初始化、验证和超时"""
+    """管理用户会话，包括初始化、验证、超时和持久化"""
     @staticmethod
     def init_session():
         """初始化或验证会话"""
         # 每个浏览器会话只初始化一次
         if 'session_initialized' not in st.session_state:
             st.session_state.session_initialized = True
-            # 尝试从持久化存储中恢复会话
-            SessionManager._restore_from_storage()
+            SessionManager._restore_from_storage()  # 首次加载尝试恢复持久化 session
             
-        # 确保关键的会话状态键存在
+        # 确保关键的会话状态键存在，避免读取 KeyError
         if 'user' not in st.session_state:
             st.session_state.user = None
         if 'authenticated' not in st.session_state:
             st.session_state.authenticated = False
 
-        # 初始化认证服务
+        # 延迟初始化认证服务，避免循环导入
         if 'auth_service' not in st.session_state:
             from auth.auth_service import AuthService
             st.session_state.auth_service = AuthService()
@@ -33,10 +32,10 @@ class SessionManager:
                 st.error("会话已过期，请重新登录。")
                 st.rerun()
         
-        # 更新最后活动时间
+        # 记录此次请求的活跃时间，用于下一次计算
         st.session_state.last_activity = datetime.now()
-        
-        # 当存在已登录用户和令牌时才验证会话
+
+        # 当存在已登录用户和令牌时才验证会话有效性
         if st.session_state.user and st.session_state.get('auth_token'):
             user_data = st.session_state.auth_service.validate_session_token()
             if not user_data:
@@ -48,14 +47,10 @@ class SessionManager:
     def _restore_from_storage():
         """从持久化存储中恢复会话"""
         try:
-            # 注入存储脚本以启用localStorage功能
-            SessionManager._inject_storage_script()
-            
-            # 实际的恢复操作在AuthService.try_restore_session()中进行
-            # 该方法使用Supabase内置的会话持久化功能
-            
+            SessionManager._inject_storage_script()  # 注入 JS，使得前端 localStorage 数据可被读取
+            # 实际的 token 恢复在 AuthService.try_restore_session 中完成
         except Exception:
-            pass  # 在恢复过程中忽略错误
+            pass  # 恢复失败不阻断主流程
     
     @staticmethod
     def _inject_storage_script():
@@ -93,15 +88,14 @@ class SessionManager:
         };
         </script>
         """
-        st.markdown(storage_script, unsafe_allow_html=True)
+        st.markdown(storage_script, unsafe_allow_html=True)  # 将脚本写入页面
 
     @staticmethod
     def clear_session_state():
         """清除所有会话状态数据"""
-        # 清除持久化存储
-        SessionManager._clear_persistent_storage()
+        SessionManager._clear_persistent_storage()  # 先同步清空浏览器 localStorage
         
-        # 保留session_initialized键，删除其他所有键
+        # 保留 session_initialized 键，删除其他所有键，避免重复初始化
         keys_to_keep = ['session_initialized']
         for key in list(st.session_state.keys()):
             if key not in keys_to_keep:
@@ -117,7 +111,7 @@ class SessionManager:
         }
         </script>
         """
-        st.markdown(clear_script, unsafe_allow_html=True)
+        st.markdown(clear_script, unsafe_allow_html=True)  # 执行前端清理
     
     @staticmethod
     def _save_to_persistent_storage(user_data, auth_token):
@@ -135,7 +129,7 @@ class SessionManager:
         }}
         </script>
         """
-        st.markdown(save_script, unsafe_allow_html=True)
+        st.markdown(save_script, unsafe_allow_html=True)  # 在浏览器端持久化认证信息
 
     @staticmethod
     def is_authenticated():
@@ -183,11 +177,11 @@ class SessionManager:
             
         success, user_data = st.session_state.auth_service.sign_in(email, password)
         
-        # 如果登录成功，则保存到持久化存储
+        # 登录成功且拿到 token 时，再同步存入浏览器
         if success and 'auth_token' in st.session_state:
             SessionManager._save_to_persistent_storage(
                 user_data, 
                 st.session_state.auth_token
             )
-            
+        
         return success, user_data

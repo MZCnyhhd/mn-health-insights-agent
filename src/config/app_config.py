@@ -1,9 +1,6 @@
 # 应用基本信息
 APP_NAME = "HEALTH INSIGHT AI"  # 应用名称
 APP_DESCRIPTION = "聚焦健康状态，AI 级联洞察体检数据，带来更安心的健康管理体验。"  # 应用描述
-APP_ICON = ""  # 应用图标 (已弃用)
-APP_TAGLINE = ""  # 应用标语 (已弃用)
-
 # 应用设置
 MAX_UPLOAD_SIZE_MB = 20  # 最大上传文件大小 (MB)
 MAX_PDF_PAGES = 50  # PDF最大页数

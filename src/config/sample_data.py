@@ -1,8 +1,8 @@
 SAMPLE_REPORT = """--- 个人信息 ---
-姓名: 赵秀英
-年龄: 68
-性别: 女
-体检编号: MN-202501180833
+姓名: test-name
+年龄: test-age
+性别: test-gender
+体检编号: MN-XXXXXXXX-001
 
 --- 一般检查 ---
 身高: 158 cm

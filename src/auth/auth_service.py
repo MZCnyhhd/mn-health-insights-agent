@@ -1,15 +1,15 @@
-import streamlit as st
-from st_supabase_connection import SupabaseConnection
+import streamlit as st  # Streamlit 提供会话状态与 UI 反馈能力
+from st_supabase_connection import SupabaseConnection  # 自定义的 Supabase 连接封装
 from datetime import datetime
 import time
 import re
 
 class AuthService:
-    """处理所有与Supabase认证和数据交互相关的服务"""
+    """处理所有与 Supabase 认证和数据交互相关的服务"""
     def __init__(self):
-        """初始化AuthService，建立与Supabase的连接"""
+        """初始化 AuthService 并建立 Supabase 连接"""
         try:
-            # 自定义连接参数
+            # 自定义连接参数，以便控制超时与重试
             self.supabase = st.connection(
                 "supabase",
                 type=SupabaseConnection,
@@ -25,21 +25,21 @@ class AuthService:
             st.error(f"服务初始化失败: {str(e)}")
             raise e
         
-        # 如果没有当前会话，则尝试从Supabase恢复会话
+        # 如果没有当前会话，则尝试从 Supabase 恢复会话信息
         self.try_restore_session()
         
-        # 初始化时验证会话
+        # 初始化时立即验证一次已有令牌，确保状态一致
         if 'auth_token' in st.session_state:
             if not self.validate_session_token():
                 self.sign_out()
     
     def try_restore_session(self):
-        """尝试从Supabase存储的会话中恢复会话"""
+        """尝试从 Supabase 持久化数据中恢复会话"""
         try:
-            # 检查Supabase是否有存储的会话
+            # 直接读取 Supabase 的认证模块是否保留了会话
             session = self.supabase.client.auth.get_session()
             if session and session.access_token and 'auth_token' not in st.session_state:
-                # 验证存储的会话
+                # 拿到会话后再补拉一次用户数据，确保权限合法
                 user = self.supabase.client.auth.get_user()
                 if user and user.user:
                     user_data = self.get_user_data(user.user.id)
@@ -48,11 +48,10 @@ class AuthService:
                         st.session_state.auth_token = session.access_token
                         st.session_state.user = user_data
         except Exception:
-            # 如果恢复失败，则在没有会话的情况下继续
-            pass
+            pass  # 恢复失败则静默继续，等待用户重新登录
 
     def validate_email(self, email):
-        """验证电子邮件格式"""
+        """验证电子邮件格式是否合法"""
         pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
         return bool(re.match(pattern, email))
 
@@ -90,7 +89,7 @@ class AuthService:
                 'created_at': datetime.now().isoformat()
             }
             
-            # 将用户数据插入users表
+            # 将用户数据插入 users 表
             self.supabase.table('users').insert(user_data).execute()
             
             return True, user_data
@@ -104,7 +103,7 @@ class AuthService:
     def sign_in(self, email, password):
         """处理用户登录"""
         try:
-            # 首先清除任何现有的会话数据
+            # 登录前先清空旧会话，避免令牌混用
             self.sign_out()
             
             auth_response = self.supabase.client.auth.sign_in_with_password({
@@ -118,7 +117,7 @@ class AuthService:
                 if not user_data:
                     return False, "未找到用户数据"
                     
-                # 存储会话信息
+                # 存储会话信息，供前端 state 使用
                 st.session_state.auth_token = auth_response.session.access_token
                 st.session_state.user = user_data
                 return True, user_data
@@ -138,7 +137,7 @@ class AuthService:
             return False, str(e)
     
     def get_user(self):
-        """获取当前用户"""
+        """获取当前用户信息"""
         try:
             return self.supabase.client.auth.get_user()
         except Exception:

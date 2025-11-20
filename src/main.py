@@ -6,9 +6,6 @@ from components.analysis_form import show_analysis_form  # 导入体检报告分
 from components.footer import show_footer  # 导入页脚显示函数
 from components.header import show_header  # 导入头部问候组件
 
-from config.app_config import APP_NAME, APP_DESCRIPTION  # 导入应用名称和描述配置
-from utils.pdf_exporter import create_analysis_pdf  # 导入工具函数，用于将 Markdown 报告转换为 PDF
-
 CUSTOM_THEME = """
 <style>
 body, .stApp {
@@ -558,17 +555,17 @@ div[data-testid="stButton"] > button[kind="secondary"] {
 
 .stAlertContainer {
     display: flex;
-    align-items: center;
-}
 </style>
 """
 
 def apply_custom_theme():
-    """注入全局浅蓝+白色主题样式"""
+    """注入全局浅蓝 + 白色主题样式"""
+    # 通过 st.markdown 将整段 CSS 注入页面，实现统一 UI 风格
     st.markdown(CUSTOM_THEME, unsafe_allow_html=True)
 
 # 辅助函数：显示欢迎界面
 def show_welcome_screen():
+    """无当前会话时展示欢迎卡片和创建按钮"""
     st.markdown(
         """
         <div class='auth-shell welcome-hero'>
@@ -611,6 +608,7 @@ def show_welcome_screen():
             st.session_state.current_session = session
             # 新建体检报告时清空旧的生成报告内容，避免下拉框提前出现
             st.session_state.generated_report = None
+
             # 同时重置测试报告使用状态和上传缓存
             st.session_state.use_sample_report = False
             st.session_state.pop("uploaded_text", None)
@@ -622,6 +620,7 @@ def show_welcome_screen():
 
 # 辅助函数：显示当前会话聊天记录
 def show_chat_history():
+    """根据当前选中的会话渲染历史消息列表并隐藏重复的报告内容"""
     current_session = st.session_state.get('current_session')
     if not current_session:
         st.info("请选择或创建体检报告会话以查看历史记录。")
@@ -636,14 +635,20 @@ def show_chat_history():
         return
 
     generated_report = st.session_state.get("generated_report")
+    last_hidden_report = st.session_state.get("last_hidden_report")
 
     for message in messages:
         role = message.get('role', 'assistant')
         content = message.get('content', '')
 
         # 避免在聊天记录中再次渲染已经通过下拉框展示的生成报告内容
-        if generated_report and role == 'assistant' and content == generated_report:
-            continue
+        hidden_report = last_hidden_report or generated_report
+        if role == 'assistant':
+            if hidden_report and content == hidden_report:
+                continue
+            first_line = content.strip().splitlines()[0] if content.strip() else ""
+            if "体检报告" in first_line:
+                continue
 
         chat_role = 'assistant' if role == 'assistant' else 'user'
         with st.chat_message(chat_role):
@@ -652,12 +657,12 @@ def show_chat_history():
 
 def main():  # 定义应用的主入口函数
     """应用主函数"""  # 函数文档：应用整体逻辑从此函数开始
-    # 初始化会话状态
-    SessionManager.init_session()  # 调用会话管理器，初始化或恢复用户会话状态
-    apply_custom_theme()  # 应用全局主题样式
+    # 先初始化会话，再注入全局样式，确保后续组件安全访问 session_state
+    SessionManager.init_session()
+    apply_custom_theme()
 
     if 'current_session' not in st.session_state:
-        st.session_state.current_session = None
+        st.session_state.current_session = None  # 提前确保 key 存在
 
     # 未登录用户显示登录/注册页面
     if not st.session_state.get('user'):
@@ -665,19 +670,16 @@ def main():  # 定义应用的主入口函数
         show_footer()
         return
 
-    show_header()
-
-    # 显示侧边栏
+    show_header()  # 顶部问候语与导航
     show_sidebar()  # 渲染左侧的历史会话列表和退出登录按钮
 
-    # 主聊天区域
-    if st.session_state.get('current_session'):  # 如果存在当前选中的体检报告会话
+    if st.session_state.get('current_session'):
         # 如果有当前会话，则显示分析表单和聊天记录
-        show_analysis_form()  # 显示报告上传及“分析报告”按钮表单
-        show_chat_history()  # 显示该会话下已有的 AI 分析记录
+        show_analysis_form()
+        show_chat_history()
     else:
         # 否则，显示欢迎界面
-        show_welcome_screen()  # 在尚未创建任何会话时显示欢迎页
+        show_welcome_screen()
 
     show_footer()
 

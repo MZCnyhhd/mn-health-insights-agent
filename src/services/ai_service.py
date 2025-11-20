@@ -6,11 +6,6 @@ def init_analysis_state():
     if 'analysis_agent' not in st.session_state:
         st.session_state.analysis_agent = AnalysisAgent()
 
-def check_rate_limit():
-    # Ensure analysis agent is initialized
-    init_analysis_state()
-    return st.session_state.analysis_agent.check_rate_limit()
-
 def generate_analysis(data, system_prompt, check_only=False, session_id=None):
     """Generate analysis if within rate limits."""
     # Ensure analysis agent is initialized
