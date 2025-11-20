@@ -165,7 +165,7 @@ class SessionManager:
         """删除一个聊天会话"""
         if not SessionManager.is_authenticated():
             return False, "未通过身份验证"
-        return st.session_state.auth_service.delete_session(session_id)
+        return st.session_state.auth_service.delete_session(str(session_id))
     
     @staticmethod
     def logout():

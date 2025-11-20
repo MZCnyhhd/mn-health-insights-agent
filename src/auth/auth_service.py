@@ -187,6 +187,18 @@ class AuthService:
         except Exception as e:
             return False, str(e)
 
+    def update_session_title(self, session_id, new_title):
+        try:
+            sid = str(session_id)
+            self.supabase.table('chat_sessions')\
+                .update({'title': new_title})\
+                .eq('id', sid)\
+                .execute()
+            return True
+        except Exception as e:
+            st.error(f"更新会话标题失败: {str(e)}")
+            return False
+
     def get_session_messages(self, session_id):
         """获取会话的所有消息"""
         try:
@@ -202,16 +214,18 @@ class AuthService:
     def delete_session(self, session_id):
         """删除一个聊天会话及其所有消息"""
         try:
-            # 删除会话中的所有消息
+            sid = str(session_id)
+
+            # 删除会话中的所有消息（忽略删除条数，只要不抛错即可）
             self.supabase.table('chat_messages')\
                 .delete()\
-                .eq('session_id', session_id)\
+                .eq('session_id', sid)\
                 .execute()
 
-            # 删除会话本身
+            # 删除会话本身，如果 Supabase 不抛异常则视为成功
             self.supabase.table('chat_sessions')\
                 .delete()\
-                .eq('id', session_id)\
+                .eq('id', sid)\
                 .execute()
 
             return True, None

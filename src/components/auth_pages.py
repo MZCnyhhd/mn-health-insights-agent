@@ -22,7 +22,7 @@ def show_login_page():
         <div class='auth-hero'>
             <p class='auth-hero__eyebrow'>HEALTH INSIGHT AI</p>
             <h1 class='auth-hero__title'>美年 · 智能健康洞察中心</h1>
-            <p class='auth-hero__desc'>聚焦家人健康状态，AI 级联洞察体检数据，带来更安心的健康管理体验。</p>
+            <p class='auth-hero__desc'>聚焦健康状态，AI 级联洞察体检数据，带来更安心的健康管理体验。</p>
         </div>
         """,
         unsafe_allow_html=True,
