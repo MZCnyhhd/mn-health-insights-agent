@@ -1,150 +1,241 @@
-# 🩺 HIA (Health Insights Agent)
+我来帮你重写一份完整的 README，包含项目简介、功能、技术栈、环境配置、运行方式等内容，你可以直接替换现在的 [README.md](cci:7://file:///e:/PythonProjects/GitHub/AI-Agent/hia/README.md:0:0-0:0)。我会结合当前代码结构（Streamlit + Supabase 等）来写，内容偏中文，保留必要的英文名。
 
-AI Agent to analyze blood reports and provide detailed health insights.
+下面是一份从头到尾重写的 [README.md](cci:7://file:///e:/PythonProjects/GitHub/AI-Agent/hia/README.md:0:0-0:0)，你可以直接整体替换当前文件，然后按需要再微调项目信息（比如作者、部署方式等）。
 
-<p align="center">
-  <a href="https://github.com/harshhh28/hia/issues"><img src="https://img.shields.io/github/issues/harshhh28/hia"></a> 
-  <a href="https://github.com/harshhh28/hia/stargazers"><img src="https://img.shields.io/github/stars/harshhh28/hia"></a>
-  <a href="https://github.com/harshhh28/hia/network/members"><img src="https://img.shields.io/github/forks/harshhh28/hia"></a>
-  <a href="https://github.com/harshhh28/hia/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT-blue.svg">
-  </a>
-</p>
+---
 
-<p align="center">
-  <a href="#-features">Features</a> |
-  <a href="#%EF%B8%8F-tech-stack">Tech Stack</a> |
-  <a href="#-installation">Installation</a> |
-  <a href="#-contributing">Contributing</a> |
-  <a href="#%EF%B8%8F-author">Author</a>
-</p>
+# 🩺 Health Insight AI · 智能体检报告助手
 
-<p align="center">
-  <a href="https://github.com/harshhh28/hia"><img src="https://raw.githubusercontent.com/harshhh28/hia/main/public/HIA_demo.gif" alt="Usage Demo"></a>
-</p>
+基于 **Streamlit + Supabase + Groq LLM** 打造的智能体检报告分析工具。  
+支持上传体检结果 PDF / 使用示例报告，自动提取关键指标并生成结构化、可下载的中文体检分析报告。
 
-## 🌟 Features
+---
 
-- Intelligent agent-based architecture with multi-model cascade system
-- In-context learning from previous analyses and knowledge base building
-- Medical report analysis with personalized health insights
-- PDF upload, validation and text extraction (up to 20MB)
-- Secure user authentication and session management
-- Session history with report analysis tracking
-- Modern, responsive UI with real-time feedback
+## ✨ 功能特点
 
-## 🛠️ Tech Stack
+- **PDF 体检报告上传与解析**
+  - 支持上传单个 PDF 文件（默认限制 20MB）
+  - 自动抽取文本内容并在页面中展开查看
+- **示例体检报告一键体验**
+  - 内置测试体检报告，无需真实 PDF 也可体验完整流程
+- **AI 智能分析**
+  - 使用 Groq 模型（Llama 系列）对体检报告进行结构化解读
+  - 输出包含：
+    - 关键指标总结  
+    - 异常项目说明  
+    - 生活方式 / 饮食 /运动建议  
+    - 风险提醒与随访建议
+- **多会话管理**
+  - 每次分析会生成一个独立“体检报告会话”
+  - 侧边栏支持：
+    - 历史会话列表  
+    - 按日期筛选  
+    - 按是否已生成报告折叠分组  
+    - 单选 / 多选 / 批量删除
+- **生成报告下载**
+  - 支持将 AI 分析结果导出为 PDF 文件
+- **登录与会话持久化**
+  - 用户注册 / 登录
+  - 会话与消息持久化存储在 Supabase
+  - 浏览器本地存储配合 Supabase 会话，支持自动恢复登录状态
+- **中文界面与详细中文注释**
+  - 核心代码文件（[main.py](cci:7://file:///e:/PythonProjects/GitHub/AI-Agent/hia/src/main.py:0:0-0:0)、[analysis_form.py](cci:7://file:///e:/PythonProjects/GitHub/AI-Agent/hia/src/components/analysis_form.py:0:0-0:0)、[sidebar.py](cci:7://file:///e:/PythonProjects/GitHub/AI-Agent/hia/src/components/sidebar.py:0:0-0:0)、[auth_service.py](cci:7://file:///e:/PythonProjects/GitHub/AI-Agent/hia/src/auth/auth_service.py:0:0-0:0)、[session_manager.py](cci:7://file:///e:/PythonProjects/GitHub/AI-Agent/hia/src/auth/session_manager.py:0:0-0:0)）提供了详细的中文注释，方便二次开发与维护
 
-- **Frontend Framework**: Streamlit
-- **AI Integration**: Multi-model architecture via Groq
-  - Primary: meta-llama/llama-4-maverick-17b-128e-instruct
-  - Secondary: llama-3.3-70b-versatile
-  - Tertiary: llama-3.1-8b-instant
-  - Fallback: llama3-70b-8192
-- **Database**: Supabase
-- **PDF Processing**: PDFPlumber
-- **Authentication**: Supabase Auth
+---
 
-## 🚀 Installation
+## 🧱 技术栈
 
-#### Requirements 📋
+- 前端 & 应用框架：**[Streamlit](https://streamlit.io/)**
+- 鉴权与数据存储：**[Supabase](https://supabase.com/)**
+  - 用户表：`users`
+  - 会话表：`chat_sessions`
+  - 消息表：`chat_messages`
+- 大模型调用：**[Groq](https://groq.com/)**（Llama 系列模型）
+- 部署环境：支持本地运行，亦可部署到 Streamlit Community / 自行托管
 
-- Python 3.8+
-- Streamlit 1.30.0+
-- Supabase account
-- Groq API key
-- PDFPlumber
-- Python-magic-bin (Windows) or Python-magic (Linux/Mac)
+---
 
-#### Getting Started 📝
-
-1. Clone the repository:
+## 📂 目录结构（关键部分）
 
 ```bash
-git clone https://github.com/harshhh28/hia.git
+hia/
+├─ src/
+│  ├─ main.py                # Streamlit 应用入口，主题、路由与主界面逻辑
+│  ├─ agents/
+│  │   ├─ model_manager.py   # 模型管理与 Groq API 调用
+│  │   └─ analysis_agent.py  # 报告分析代理封装
+│  ├─ auth/
+│  │   ├─ auth_service.py    # 与 Supabase 的认证 / 会话 / 消息交互
+│  │   └─ session_manager.py # Streamlit 会话状态管理、登录态持久化
+│  ├─ components/
+│  │   ├─ analysis_form.py   # PDF 上传、示例报告切换、生成报告按钮与展示
+│  │   ├─ sidebar.py         # 历史会话列表、日期筛选、批量删除
+│  │   ├─ auth_pages.py      # 登录/注册界面
+│  │   ├─ header.py          # 顶部欢迎信息
+│  │   └─ footer.py          # 底部版权信息
+│  ├─ config/
+│  │   ├─ app_config.py      # 应用基础配置（上传大小、会话超时等）
+│  │   ├─ prompts.py         # 分析用系统提示词
+│  │   └─ sample_data.py     # 示例体检报告文本
+│  ├─ services/
+│  │   └─ ai_service.py      # 分析服务入口，封装 AnalysisAgent 调用
+│  └─ utils/
+│      ├─ pdf_extractor.py   # PDF 文本抽取
+│      └─ pdf_exporter.py    # 将分析结果导出为 PDF
+└─ public/
+   └─ db/
+      └─ script.sql          # Supabase 表结构（users / chat_sessions / chat_messages）
+```
+
+---
+
+## ⚙️ 环境准备
+
+### 1. 克隆项目
+
+```bash
+git clone <your-repo-url>
 cd hia
 ```
 
-2. Install dependencies:
+### 2. 创建虚拟环境并安装依赖
+
+建议使用 Python 3.10+。
 
 ```bash
+python -m venv .venv
+.\.venv\Scripts\activate   # Windows PowerShell
+# 或 source .venv/bin/activate  # macOS / Linux
+
 pip install -r requirements.txt
 ```
 
-3. Required environment variables (in `.streamlit/secrets.toml`):
+（如果仓库中还没有 `requirements.txt`，可以根据当前环境通过 `pip freeze > requirements.txt` 生成一份。）
+
+### 3. 配置环境变量 / secrets
+
+在项目根目录 **创建 `.streamlit/secrets.toml` 文件**，填入 Supabase 与 Groq 的密钥（示例）：
 
 ```toml
-SUPABASE_URL = "your-supabase-url"
-SUPABASE_KEY = "your-supabase-key"
+SUPABASE_URL = "https://xxx.supabase.co"
+SUPABASE_KEY = "your-supabase-service-role-or-anon-key"
+
 GROQ_API_KEY = "your-groq-api-key"
 ```
 
-4. Set up Supabase database schema:
+> ⚠️ 不要将真实密钥提交到 Git 仓库。  
+> 建议在本地手动创建 `.streamlit/secrets.toml`，并在 `.gitignore` 中忽略。
 
-The application requires the following tables in your Supabase database:
+### 4. 初始化 Supabase 数据库
 
-![database schema](https://raw.githubusercontent.com/harshhh28/hia/main/public/db/schema.png)
+使用 `public/db/script.sql` 中的建表脚本在 Supabase SQL 编辑器中执行，创建：
 
-You can use the SQL script provided at `public/db/script.sql` <a href="https://www.github.com/harshhh28/hia/blob/main/public/db/script.sql">[link]</a> to set up the required database schema.
+- `users`
+- `chat_sessions`
+- `chat_messages`
 
-(PS: You can turn off the email confimation on signup in Supabase settings -> signup -> email)
+三张表及其外键关系。
 
-5. Run the application:
+---
+
+## 🚀 启动应用
+
+在项目根目录执行：
 
 ```bash
-streamlit run src\main.py
+streamlit run src/main.py
 ```
 
-## 📁 Project Structure
+启动成功后，浏览器访问：
 
-```
-hia/
-├── requirements.txt
-├── README.md
-├── src/
-│   ├── main.py                 # Application entry point
-│   ├── auth/                   # Authentication related modules
-│   │   ├── auth_service.py     # Supabase auth integration
-│   │   └── session_manager.py  # Session management
-│   ├── components/             # UI Components
-│   │   ├── analysis_form.py    # Report analysis form
-│   │   ├── auth_pages.py       # Login/Signup pages
-│   │   ├── footer.py          # Footer component
-│   │   └── sidebar.py         # Sidebar navigation
-│   ├── config/                # Configuration files
-│   │   ├── app_config.py      # App settings
-│   │   └── prompts.py         # AI prompts
-│   ├── services/              # Service integrations
-│   │   └── ai_service.py      # AI service integration
-│   ├── agents/                # Agent-based architecture components
-│   │   ├── agent_manager.py   # Agent management
-│   │   └── model_fallback.py  # Model fallback logic
-│   └── utils/                 # Utility functions
-│       ├── validators.py      # Input validation
-│       └── pdf_extractor.py   # PDF processing
-```
+- 默认：http://localhost:8501
 
-## 👥 Contributing
+---
 
-Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on how to submit pull requests, the development workflow, coding standards, and more.
+## 💡 使用指南
 
-We appreciate all contributions, from reporting bugs and improving documentation to implementing new features.
+1. **登录 / 注册**
+   - 首次进入显示登录/注册界面
+   - 完成注册后即可登录并使用体检助手
 
-## 👨‍💻 Contributors
+2. **创建新体检报告会话**
+   - 点击首页或侧边栏中的「新建体检报告」
+   - 页面右侧将进入上传与分析界面
 
-Thanks to all the amazing contributors who have helped improve this project!
+3. **上传体检报告**
+   - 在「PDF 体检结果-内容提取」折叠面板中上传 PDF 文件
+   - 或点击「使用-测试-体检结果」快速加载示例报告
 
-| Avatar | Name | GitHub | Role | Contributions | PR(s) | Notes |
-|--------|------|--------|------|---------------|-------|-------|
-| <img src="https://github.com/harshhh28.png" width="50px" height="50px" alt="harshhh28 avatar"/> | Harsh Gajjar | [harshhh28](https://github.com/harshhh28) | Project Creator & Maintainer | Core implementation, Documentation | N/A | Lead Developer |
-| <img src="https://github.com/gaurav98095.png" width="50px" height="50px" alt="gaurav98095 avatar"/> | Gaurav | [gaurav98095](https://github.com/gaurav98095) | Contributor | DB Schema, bugs | [#1](https://github.com/harshhh28/hia/pull/1), [#5](https://github.com/harshhh28/hia/pull/5), [#6](https://github.com/harshhh28/hia/pull/6), [#7](https://github.com/harshhh28/hia/pull/7) | Database Design, bugs |
+4. **生成 AI 分析**
+   - 确认原始报告文本无误后，点击「生成体检报告」
+   - 等待 AI 返回结构化分析（包括指标说明与建议）
 
-<!-- To future contributors: Your profile will be added here when your PR is merged! -->
+5. **查看与导出**
+   - 生成完成后会在页面中显示「体检报告-内容提取」折叠面板
+   - 可点击「生成 PDF」下载分析结果
 
-## 📄 License
+6. **历史会话管理**
+   - 侧边栏展示历史体检报告列表
+   - 支持按日期筛选、分组折叠、复选框批量删除等
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/harshhh28/hia/blob/main/LICENSE) file for details.
+---
+
+## 🔍 核心实现说明（简要）
+
+- **会话与用户状态**
+  - [SessionManager](cci:2://file:///e:/PythonProjects/GitHub/AI-Agent/hia/src/auth/session_manager.py:5:0-186:33) 通过 `st.session_state` 维护当前用户、会话、令牌等
+  - 利用浏览器 `localStorage` 与 Supabase 自带 session 实现登录持久化
+
+- **PDF 抽取与示例切换**
+  - [analysis_form.get_report_contents()](cci:1://file:///e:/PythonProjects/GitHub/AI-Agent/hia/src/components/analysis_form.py:23:0-106:15) 根据当前会话 ID 生成唯一上传控件 key，避免新建会话沿用旧文件
+  - 支持示例报告与上传 PDF 二选一，并在切换来源时清空旧的生成结果
+
+- **AI 调用**
+  - [ModelManager](cci:2://file:///e:/PythonProjects/GitHub/AI-Agent/hia/src/agents/model_manager.py:7:0-97:87) 封装 Groq API 的调用和模型降级逻辑
+  - [AnalysisAgent](cci:2://file:///e:/PythonProjects/GitHub/AI-Agent/hia/src/agents/analysis_agent.py:3:0-43:21) 负责将报告内容和系统 Prompt 交给模型，并统一返回结构化结果
+
+- **聊天记录与去重展示**
+  - [show_chat_history()](cci:1://file:///e:/PythonProjects/GitHub/AI-Agent/hia/src/main.py:621:0-654:32) 中会根据 `generated_report` / `last_hidden_report` 过滤掉已经在折叠面板中展示过的完整报告内容，避免重复显示
+
+---
+
+## 🧪 本地开发建议
+
+- 修改代码后可直接保存，Streamlit 会自动热重载
+- 遇到奇怪的状态问题时，可以：
+  - 清空浏览器缓存 / localStorage
+  - 调用注销按钮触发 [SessionManager.clear_session_state()](cci:1://file:///e:/PythonProjects/GitHub/AI-Agent/hia/src/auth/session_manager.py:92:4-101:41)
+- 建议在开发环境中使用 **独立的 Supabase 项目** 和测试 API Key
+
+---
+
+## 🤝 贡献
+
+欢迎对以下方面进行改进：
+
+- 模型提示词与输出结构优化  
+- 报告可视化组件（图表、颜色标记等）  
+- 更多体检报告模版支持  
+- 部署脚本与 CI/CD 配置  
+
+可以通过 Pull Request 或 Issue 的形式参与。
+
+---
+
+## 📜 License
+
+根据你实际情况选择（例如）：
+
+- MIT License  
+- 或遵循原项目 License
+
+（如你希望，我也可以按你指定的 License 模板补全此部分。）
+
+---
 
 ## 🙋‍♂️ Author
 
-Created by [Harsh Gajjar](https://harshgajjar.vercel.app)
+- Maintainer: **你的名字 / Your Name**  
+- Email / WeChat / 主页：自行补充
+
+> 若本项目基于其他开源模板或示例，可以在这里附上原作者或仓库链接以示感谢。
