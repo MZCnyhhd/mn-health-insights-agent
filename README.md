@@ -1,10 +1,4 @@
-我来帮你重写一份完整的 README，包含项目简介、功能、技术栈、环境配置、运行方式等内容，你可以直接替换现在的 [README.md](cci:7://file:///e:/PythonProjects/GitHub/AI-Agent/hia/README.md:0:0-0:0)。我会结合当前代码结构（Streamlit + Supabase 等）来写，内容偏中文，保留必要的英文名。
-
-下面是一份从头到尾重写的 [README.md](cci:7://file:///e:/PythonProjects/GitHub/AI-Agent/hia/README.md:0:0-0:0)，你可以直接整体替换当前文件，然后按需要再微调项目信息（比如作者、部署方式等）。
-
----
-
-# 🩺 Health Insight AI · 智能体检报告助手
+# mn-health-insight-ai 智能体检报告助手
 
 基于 **Streamlit + Supabase + Groq LLM** 打造的智能体检报告分析工具。  
 支持上传体检结果 PDF / 使用示例报告，自动提取关键指标并生成结构化、可下载的中文体检分析报告。
